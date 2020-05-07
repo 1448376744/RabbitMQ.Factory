@@ -5,9 +5,8 @@ using System.Text;
 
 namespace RabbitMQ.Factory
 {
-    public interface IRabbitMQContext:IDisposable
+    public interface IRabbitMQContext : IModel
     {
-        IConnection Connection { get; }
-        IModel Channel { get; }
+        IConnection GetConnection();
     }
 }

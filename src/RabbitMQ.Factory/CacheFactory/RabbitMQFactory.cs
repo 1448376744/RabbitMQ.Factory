@@ -15,9 +15,9 @@ namespace RabbitMQ.Factory
         private bool _disposed = false;
 
         /// <summary>
-        /// 连接命名
+        /// 连接工厂
         /// </summary>
-        private readonly Dictionary<string, ConnectionFactoryOptions> _factorys;           
+        private readonly Dictionary<string, ConnectionFactoryOptions> _factorys;
 
         /// <summary>
         /// 连接缓存
@@ -33,37 +33,34 @@ namespace RabbitMQ.Factory
         /// <summary>
         /// 获取连接
         /// </summary>
-        /// <param name="connectionName"></param>
+        /// <param name="clientProvidedName"></param>
         /// <returns></returns>
-        private Connection GetConnection(string clientProvidedName)
+        public IConnection GetConnection(string clientProvidedName)
         {
             if (_factorys.TryGetValue(clientProvidedName, out ConnectionFactoryOptions options))
             {
-                var connetions = _connections.GetOrAdd(clientProvidedName, f =>
+                //初始化连接池
+                var connections = _connections.GetOrAdd(clientProvidedName, f =>
                 {
-                    return new ConcurrentQueue<Connection>();
-                });
-                if (!connetions.TryDequeue(out Connection connection))
-                {
-                    connection = new Connection(options.ConnectionFactory.CreateConnection(clientProvidedName),
-                        options.PerConnectionChannelMaxCount);
-                    connection.OnReturnHandler += (c) =>
+                    var queue = new ConcurrentQueue<Connection>();
+                    for (int i = 0; i < options.ConnectionMaxCount; i++)
                     {
-                        //如果高于最高配置，则直接释放，否则返还
-                        if (options.ConnectionMaxCount <= connetions.Count)
-                        {
-                            c.Close();
-                        }
-                        else if(c.IsOpen)
-                        {
-                            connetions.Enqueue(c);
-                        }
-                    };
-                }
-                if (connection!=null)
+                        var conne = new Connection(
+                            options.ConnectionFactory.CreateConnection(clientProvidedName),
+                            options.PerConnectionChannelMaxCount);
+                        queue.Enqueue(conne);
+                    }
+                    return queue;
+                });
+                connections.TryDequeue(out Connection connection);//出队列
+                //如果已经被释放，或者获取不到
+                if (connection == null || !connection.IsOpen)
                 {
-                    connection._disposed = false;
+                    connection = new Connection(
+                        options.ConnectionFactory.CreateConnection(clientProvidedName),
+                        options.PerConnectionChannelMaxCount);
                 }
+                connections.Enqueue(connection);//重新排队
                 return connection;
             }
             else
@@ -71,7 +68,6 @@ namespace RabbitMQ.Factory
                 return null;
             }
         }
-
         /// <summary>
         /// 获取信道
         /// </summary>
@@ -83,8 +79,8 @@ namespace RabbitMQ.Factory
             var channel = connection.CreateModel();
             return new RabbitMQContext(new RabbitMQContextBuilder
             {
-                Connection=connection,
-                Channel=channel
+                Connection = connection,
+                Channel = channel
             });
         }
 

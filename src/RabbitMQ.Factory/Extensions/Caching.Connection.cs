@@ -8,16 +8,12 @@ namespace RabbitMQ.Factory.Extensions
 {
     internal partial class Connection
     {
-        internal bool _disposed { get; set; }
-
         private readonly ConcurrentQueue<Model> _models
             = new ConcurrentQueue<Model>();
 
         private readonly int _perConnectionChannelCount;
 
         private readonly IConnection _connection;
-
-        internal event Action<Connection> OnReturnHandler;
 
         public Connection(IConnection connection, int perConnectionChannelCount)
         {
@@ -27,11 +23,7 @@ namespace RabbitMQ.Factory.Extensions
 
         public void Dispose()
         {
-            if (!_disposed)
-            {
-                _disposed = true;
-                OnReturnHandler?.Invoke(this);
-            }
+            _connection?.Dispose();
         }
 
         public IModel CreateModel()
@@ -51,12 +43,11 @@ namespace RabbitMQ.Factory.Extensions
                     }
                 };
             }
-            if (model!=null)
+            if (model != null)
             {
                 model._disposed = false;
             }
             return model;
         }
-
     }
 }

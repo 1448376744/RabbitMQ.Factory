@@ -26,7 +26,8 @@ namespace RabbitMQ.Testing
             {
                 b.AddConnectionFactory("test", a =>
                 {
-                    a.ConnectionMaxCount = 2;
+                    a.ConnectionMaxCount = 0;
+                    a.PerConnectionChannelMaxCount = 10;
                     a.ConnectionFactory = new ConnectionFactory()
                     {
                         HostName = "47.95.214.86",
@@ -37,7 +38,8 @@ namespace RabbitMQ.Testing
                 });
                 b.AddConnectionFactory("test2", a =>
                 {
-                    a.ConnectionMaxCount = 2;
+                    a.ConnectionMaxCount = 0;
+                    a.PerConnectionChannelMaxCount = 10;
                     a.ConnectionFactory = new ConnectionFactory()
                     {
                         HostName = "47.95.214.86",

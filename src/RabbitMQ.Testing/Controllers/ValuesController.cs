@@ -26,7 +26,7 @@ namespace RabbitMQ.Testing.Controllers
         [HttpGet]
         public string Get()
         {
-            _context.Channel
+            _context
                 .BasicPublish("", "hello", false, null, Encoding.UTF8.GetBytes("rabbitmq"));
             return "success";
         }

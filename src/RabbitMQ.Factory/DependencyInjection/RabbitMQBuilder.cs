@@ -42,16 +42,17 @@ namespace RabbitMQ.Factory
         {
             var p = Expression.Parameter(typeof(RabbitMQContextBuilder));
             var body = Expression.New(typeof(TRabbitMQContext)
-                .GetConstructor(new Type[] { typeof(RabbitMQContextBuilder) }),p);
-            var lambda = Expression.Lambda(body,p);
+                .GetConstructor(new Type[] { typeof(RabbitMQContextBuilder) }), p);
+            var lambda = Expression.Lambda(body, p);
             var func = lambda.Compile() as Func<RabbitMQContextBuilder, TRabbitMQContext>;
             _services.AddScoped(s =>
             {
-                var context =  _factory.GetRabbitMQContext(clientProvidedName);
-                return func(new RabbitMQContextBuilder 
+                var connection = _factory.GetConnection(clientProvidedName);
+                var channel = connection.CreateModel();
+                return func(new RabbitMQContextBuilder
                 {
-                    Connection=context.Connection,
-                    Channel=context.Channel
+                    Connection = connection,
+                    Channel = channel
                 });
             });
             return this;

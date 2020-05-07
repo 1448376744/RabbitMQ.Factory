@@ -1,0 +1,89 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>RabbitMQ.Factory</name>
+    </assembly>
+    <members>
+        <member name="M:RabbitMQ.Factory.IRabbitMQFactory.GetRabbitMQContext(System.String)">
+            <summary>
+            获取信道
+            </summary>
+            <param name="clientProvidedName"></param>
+            <returns></returns>
+        </member>
+        <member name="T:RabbitMQ.Factory.RabbitMQFactory">
+            <summary>
+            RabbitMQ缓存工厂,基于释放模式请不要执行Close来关闭连接或者信道
+            </summary>
+        </member>
+        <member name="F:RabbitMQ.Factory.RabbitMQFactory._factorys">
+            <summary>
+            连接工厂
+            </summary>
+        </member>
+        <member name="F:RabbitMQ.Factory.RabbitMQFactory._connections">
+            <summary>
+            连接缓存
+            </summary>
+        </member>
+        <member name="M:RabbitMQ.Factory.RabbitMQFactory.GetConnection(System.String)">
+            <summary>
+            获取连接
+            </summary>
+            <param name="clientProvidedName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:RabbitMQ.Factory.RabbitMQFactory.GetRabbitMQContext(System.String)">
+            <summary>
+            获取信道
+            </summary>
+            <param name="clientProvidedName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:RabbitMQ.Factory.RabbitMQFactory.Create(System.Action{RabbitMQ.Factory.RabbitMQFactoryBuilder})">
+            <summary>
+            创建RabbitMQFactory实例
+            </summary>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
+        <member name="M:RabbitMQ.Factory.RabbitMQFactoryBuilder.AddConnectionFactory(System.String,System.Action{RabbitMQ.Factory.Extensions.ConnectionFactoryOptions})">
+            <summary>
+            添加连接工厂
+            </summary>
+            <param name="clientProvidedName">同一个RabbitMQFactory实例中必须唯一</param>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
+        <member name="M:RabbitMQ.Factory.RabbitMQBuilder.AddRabbitMQContext(System.String)">
+            <summary>
+            添加IRabbitMQContext类型的RabbitMQContext
+            </summary>
+            <param name="clientProvidedName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:RabbitMQ.Factory.RabbitMQBuilder.AddRabbitMQContext``1(System.String)">
+            <summary>
+            添加TRabbitMQContext类型的RabbitMQContext
+            </summary>
+            <typeparam name="TRabbitMQContext"></typeparam>
+            <param name="clientProvidedName"></param>
+            <returns></returns>
+        </member>
+        <member name="P:RabbitMQ.Factory.Extensions.ConnectionFactoryOptions.ConnectionFactory">
+            <summary>
+            ConnectionFactory
+            </summary>
+        </member>
+        <member name="P:RabbitMQ.Factory.Extensions.ConnectionFactoryOptions.ConnectionMaxCount">
+            <summary>
+            最大连接数，如果连接池中不存在连接则新建，否则从连接池返回(通过释放模式)，如果返回给连接池的连接超过ConnectionMaxCount则直接释放
+            </summary>
+        </member>
+        <member name="P:RabbitMQ.Factory.Extensions.ConnectionFactoryOptions.PerConnectionChannelMaxCount">
+            <summary>
+            每个连接的最大信道数，如果信道池中不存在信道则新建，否则从信道池返回(通过释放模式)，如果返回给信道池的信道超过ConnectionMaxCount则直接释放
+            </summary>
+        </member>
+    </members>
+</doc>
