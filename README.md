@@ -1,6 +1,6 @@
 # RabbitMQ.Factory
 
-## 内部采用多线程对象服用技术已优化连接的开启释放，保证你的每个action获取到的RabbitMQContext对象关联的RabbitMQ的连接和信道对象都是线程唯一的
+## 内部采用多线程对象服用技术已优化连接的开启释放，保证你的每个action获取到的RabbitMQContext对象关联的RabbitMQ的连接和信道对象都是线程唯一的，提高接口的响应速度
 
 ``` c#
 //注册RabbitMQ上下文到IOC容器中
