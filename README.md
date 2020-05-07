@@ -11,7 +11,7 @@ services.AddRabbitMQFactory(b =>
 //表示同一个时刻该app只能保存10个连接，采用线程共用(每次获取连接采用轮换方式，多线程共用意味着多个线程的连接可能是相同的)
                     a.ConnectionMaxCount = 10;
 //表示同一个连接所能关联的信道个数，采用多线程复用（同一个连接只能在一个线程中使用，但是用完之后返回池，等待下一次获取），如果线程被阻塞导致池中的
-信道不够用则自动重新创建，待最终返回时，多出的部分直接释放，而不是返回池中
+//信道不够用则自动重新创建，待最终返回时，多出的部分直接释放，而不是返回池中
                     a.PerConnectionChannelMaxCount = 1;
                     a.ConnectionFactory = new ConnectionFactory()
                     {
