@@ -1,8 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Generic;
 using System.Linq.Expressions;
-using System.Text;
 
 namespace RabbitMQ.Factory
 {
@@ -23,21 +21,22 @@ namespace RabbitMQ.Factory
         /// </summary>
         /// <param name="clientProvidedName"></param>
         /// <returns></returns>
-        public RabbitMQBuilder AddRabbitMQContext(string clientProvidedName)
+        public RabbitMQBuilder AddRabbitMQContext(string clientProvidedName, ServiceLifetime lifetime = ServiceLifetime.Scoped)
         {
-            _services.AddScoped(s =>
-            {
-                return _factory.GetRabbitMQContext(clientProvidedName);
-            });
+            _services.Add(new ServiceDescriptor(typeof(IRabbitMQContext), s =>
+             {
+                 return _factory.GetRabbitMQContext(clientProvidedName);
+             }, lifetime));
             return this;
         }
+
         /// <summary>
         /// 添加TRabbitMQContext类型的RabbitMQContext
         /// </summary>
         /// <typeparam name="TRabbitMQContext"></typeparam>
         /// <param name="clientProvidedName"></param>
         /// <returns></returns>
-        public RabbitMQBuilder AddRabbitMQContext<TRabbitMQContext>(string clientProvidedName)
+        public RabbitMQBuilder AddRabbitMQContext<TRabbitMQContext>(string clientProvidedName, ServiceLifetime lifetime = ServiceLifetime.Scoped)
             where TRabbitMQContext : RabbitMQContext
         {
             var p = Expression.Parameter(typeof(RabbitMQContextBuilder));
@@ -45,16 +44,16 @@ namespace RabbitMQ.Factory
                 .GetConstructor(new Type[] { typeof(RabbitMQContextBuilder) }), p);
             var lambda = Expression.Lambda(body, p);
             var func = lambda.Compile() as Func<RabbitMQContextBuilder, TRabbitMQContext>;
-            _services.AddScoped(s =>
-            {
-                var connection = _factory.GetConnection(clientProvidedName);
-                var channel = connection.CreateModel();
-                return func(new RabbitMQContextBuilder
-                {
-                    Connection = connection,
-                    Channel = channel
-                });
-            });
+            _services.Add(new ServiceDescriptor(typeof(TRabbitMQContext), s =>
+             {
+                 var connection = _factory.GetConnection(clientProvidedName);
+                 var channel = connection.CreateModel();
+                 return func(new RabbitMQContextBuilder
+                 {
+                     Connection = connection,
+                     Channel = channel
+                 });
+             }, lifetime));
             return this;
         }
     }
